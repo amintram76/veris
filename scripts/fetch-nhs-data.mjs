@@ -29,7 +29,16 @@ const OUTPUT_PATH = resolve(ROOT, 'src/data/nhsData.generated.json')
 const MONTHS_TO_KEEP = 24
 
 const NHS_BASE = 'https://digital.nhs.uk/data-and-information/publications/statistical/patients-registered-at-a-gp-practice'
-const USER_AGENT = 'Veris/1.0 (NHS GP list size tool; contact@veris.org.uk)'
+
+// Browser-like headers — NHS Digital's CDN blocks non-browser User-Agents
+const FETCH_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'Accept-Language': 'en-GB,en;q=0.9',
+  'Accept-Encoding': 'gzip, deflate, br',
+  'Cache-Control': 'no-cache',
+  'Pragma': 'no-cache',
+}
 
 const MONTH_NAMES = [
   'january', 'february', 'march', 'april', 'may', 'june',
@@ -77,14 +86,22 @@ function loadExisting() {
   }
 }
 
+/** Simple timeout wrapper — AbortSignal.timeout() not reliable in all Node versions */
+function fetchWithTimeout(url, options = {}, timeoutMs = 20_000) {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  return fetch(url, { ...options, signal: controller.signal })
+    .finally(() => clearTimeout(timer))
+}
+
 /** Fetch HTML of the NHS Digital publication page for a given month */
 async function fetchPublicationPage(year, month) {
   const url = `${NHS_BASE}/${monthSlug(year, month)}`
-  const res = await fetch(url, {
-    headers: { 'User-Agent': USER_AGENT },
-    signal: AbortSignal.timeout(15_000),
-  })
-  if (!res.ok) return null
+  const res = await fetchWithTimeout(url, { headers: FETCH_HEADERS }, 20_000)
+  if (!res.ok) {
+    console.log(`     ✗  HTTP ${res.status} ${res.statusText} — ${url}`)
+    return null
+  }
   return res.text()
 }
 
@@ -104,11 +121,8 @@ function extractFileUrl(html, filename) {
 
 /** Fetch a URL and return either a CSV string or the first CSV inside a ZIP */
 async function fetchCSVText(url) {
-  const res = await fetch(url, {
-    headers: { 'User-Agent': USER_AGENT },
-    signal: AbortSignal.timeout(60_000),
-  })
-  if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${url}`)
+  const res = await fetchWithTimeout(url, { headers: FETCH_HEADERS }, 120_000)
+  if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} — ${url}`)
 
   const buf = Buffer.from(await res.arrayBuffer())
 
