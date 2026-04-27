@@ -1,0 +1,13 @@
+[build]
+  # Fetch NHS data first (non-fatal if NHS is unavailable), then build the site
+  command = "node scripts/fetch-nhs-data.mjs && npm run build"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+
+# Redirect all routes to index.html for React Router (SPA)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

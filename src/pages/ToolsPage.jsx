@@ -1,12 +1,13 @@
+import { Link } from 'react-router-dom'
 import styles from './ContentPage.module.css'
 
 const tools = [
   {
-    title: "Coming soon",
-    description: "Practical tools for primary care leaders are being built. Check back soon — or get in touch if there's something specific you'd find useful.",
-    tag: "Upcoming",
-    link: null,
-  }
+    title: "GP Practice list size comparison",
+    description: "Compare registered patient list sizes across practices over time. Benchmark your practice against others and the England national average, with charts and key statistics.",
+    tag: "Data & Analytics",
+    link: "/tools/gp-list-sizes",
+  },
 ]
 
 export default function ToolsPage() {
@@ -32,7 +33,7 @@ export default function ToolsPage() {
                 <h3 className={styles.cardTitle}>{tool.title}</h3>
                 <p className={styles.cardDesc}>{tool.description}</p>
                 {tool.link && (
-                  <a href={tool.link} className={styles.cardLink}>Open tool →</a>
+                  <Link to={tool.link} className={styles.cardLink}>Open tool →</Link>
                 )}
               </div>
             ))}
