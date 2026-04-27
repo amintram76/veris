@@ -58,7 +58,8 @@ function monthId(year, month) {
 function targetMonths() {
   const result = []
   const now = new Date()
-  // Start from last month (current month may not be published yet)
+  // Start from last month — NHS England publishes between the 10th-16th,
+  // so by the time this runs (17th) last month's data should be live.
   for (let offset = 1; offset <= MONTHS_TO_KEEP; offset++) {
     const d = new Date(now.getFullYear(), now.getMonth() - offset, 1)
     result.unshift({ year: d.getFullYear(), month: d.getMonth() + 1 })

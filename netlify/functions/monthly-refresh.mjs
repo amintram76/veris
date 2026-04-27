@@ -1,8 +1,10 @@
 /**
  * monthly-refresh.mjs
  *
- * Netlify Scheduled Function — fires on the 3rd of each month at 07:00 UTC.
- * (NHS England publishes data on the 1st; the 3rd gives a comfortable buffer.)
+ * Netlify Scheduled Function — fires on the 17th of each month at 07:00 UTC.
+ * NHS England publishes the GP Patient Register between the 10th–16th of each
+ * month, so the 17th gives a reliable one-day buffer after the latest
+ * possible publication date.
  *
  * All it does is POST to the Netlify Build Hook, which triggers a fresh build
  * that runs scripts/fetch-nhs-data.mjs and picks up the new month's data.
@@ -19,7 +21,7 @@
 
 import { schedule } from '@netlify/functions'
 
-export const handler = schedule('0 7 3 * *', async (_event) => {
+export const handler = schedule('0 7 17 * *', async (_event) => {
   const hookUrl = process.env.NETLIFY_BUILD_HOOK_URL
 
   if (!hookUrl) {
