@@ -4,6 +4,6 @@ dist
 *.local
 .claude/
 
-# Generated at build time by scripts/fetch-nhs-data.mjs
-# Netlify fetches this fresh on every build
-src/data/nhsData.generated.json
+# Generated locally by: npm run fetch-data
+# Commit this file after running the script to update live NHS data
+# src/data/nhsData.generated.json  ← intentionally tracked in git

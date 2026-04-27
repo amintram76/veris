@@ -1,6 +1,5 @@
 [build]
-  # Fetch NHS data first (non-fatal if NHS is unavailable), then build the site
-  command = "node scripts/fetch-nhs-data.mjs && npm run build"
+  command = "npm run build"
   publish = "dist"
 
 [build.environment]
