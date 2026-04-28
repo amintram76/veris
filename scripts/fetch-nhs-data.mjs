@@ -26,7 +26,9 @@ import AdmZip from 'adm-zip'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
 const OUTPUT_PATH = resolve(ROOT, 'src/data/nhsData.generated.json')
-const MONTHS_TO_KEEP = 24
+// Earliest month to include in the dataset
+const DATA_START_YEAR  = 2019
+const DATA_START_MONTH = 4  // April
 
 const NHS_BASE = 'https://digital.nhs.uk/data-and-information/publications/statistical/patients-registered-at-a-gp-practice'
 
@@ -63,15 +65,24 @@ function monthId(year, month) {
   return `${year}-${String(month).padStart(2, '0')}`
 }
 
-/** Returns the last MONTHS_TO_KEEP months ending with the month before today */
+/**
+ * Returns all months from DATA_START (Apr 2019) up to and including last month.
+ * NHS England publishes between the 10th–16th so "last month" is always safe
+ * when running on or after the 17th.
+ */
 function targetMonths() {
   const result = []
   const now = new Date()
-  // Start from last month — NHS England publishes between the 10th-16th,
-  // so by the time this runs (17th) last month's data should be live.
-  for (let offset = 1; offset <= MONTHS_TO_KEEP; offset++) {
-    const d = new Date(now.getFullYear(), now.getMonth() - offset, 1)
-    result.unshift({ year: d.getFullYear(), month: d.getMonth() + 1 })
+  // End at last month
+  const endYear  = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear()
+  const endMonth = now.getMonth() === 0 ? 12 : now.getMonth()
+
+  let year  = DATA_START_YEAR
+  let month = DATA_START_MONTH
+  while (year < endYear || (year === endYear && month <= endMonth)) {
+    result.push({ year, month })
+    month++
+    if (month > 12) { month = 1; year++ }
   }
   return result
 }
