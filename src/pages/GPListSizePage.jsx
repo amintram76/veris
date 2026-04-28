@@ -109,7 +109,7 @@ export default function GPListSizePage() {
               <h2 className={styles.emptyTitle}>Search for a practice to get started</h2>
               <p className={styles.emptyDesc}>
                 Use the search field above to find your own GP practice, then add others to compare.
-                Data covers the last 24 months with monthly granularity.
+                Data covers monthly snapshots from April 2019 to the present.
               </p>
             </div>
           )}

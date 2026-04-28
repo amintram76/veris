@@ -126,6 +126,57 @@
   color: var(--ink-muted);
 }
 
+/* % change cell with optional "adj." badge */
+.pctCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.adjustedBadge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #D97706;
+  background: #FEF3C7;
+  border: 1px solid #FDE68A;
+  border-radius: 3px;
+  padding: 1px 4px;
+  cursor: default;
+  white-space: nowrap;
+}
+
+/* Merger footnote below table */
+.mergerNote {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: var(--space-md);
+  padding: 0.75rem 1rem;
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  color: #78350F;
+  line-height: 1.6;
+}
+
+.mergerNoteIcon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  line-height: 1.6;
+}
+
+.mergerLink {
+  color: #92400E;
+  text-decoration: underline;
+}
+
+.mergerLink:hover {
+  color: #78350F;
+}
+
 .source {
   margin-top: var(--space-md);
   font-size: 0.75rem;

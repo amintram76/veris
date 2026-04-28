@@ -35,6 +35,10 @@ export const nationalAverages = [
   9487, 9499, 9512, 9524, 9537, 9549, 9562, 9574,
 ]
 
+// England-wide total registered patients (national avg × ~6,300 practices)
+// Used for population-level growth comparison rather than average practice comparison
+export const englandTotals = nationalAverages.map(avg => Math.round(avg * 6300))
+
 // ─── Sample data helper ───────────────────────────────────────────────────
 // Generates 24 monthly list-size values from a base (May 2024) + monthly delta.
 // Deterministic — no randomness — so values are stable across renders.

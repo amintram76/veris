@@ -63,3 +63,31 @@
   font-weight: 600;
   white-space: nowrap;
 }
+
+.tooltipMergerBadge {
+  color: #D97706;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.74rem;
+}
+
+/* Merger annotation note above chart */
+.mergerNote {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  margin-bottom: var(--space-sm);
+  line-height: 1.4;
+}
+
+.mergerDot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #F59E0B;
+  flex-shrink: 0;
+}

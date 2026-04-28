@@ -331,9 +331,11 @@ async function main() {
 
   // Also track national totals per period
   const nationalByPeriod = {}
+  const englandTotalByPeriod = {}
   if (existing?.periods) {
     for (let i = 0; i < existing.periods.length; i++) {
-      nationalByPeriod[existing.periods[i].id] = existing.nationalAverages?.[i] ?? null
+      nationalByPeriod[existing.periods[i].id]    = existing.nationalAverages?.[i] ?? null
+      englandTotalByPeriod[existing.periods[i].id] = existing.englandTotals?.[i] ?? null
     }
   }
 
@@ -366,10 +368,10 @@ async function main() {
       const practiceCount = Object.keys(totals).length
       if (practiceCount === 0) { console.log(`     ⚠  CSV parsed but found 0 practices — skipping`); continue }
 
-      const nationalAvg = Math.round(
-        Object.values(totals).reduce((s, v) => s + v, 0) / practiceCount
-      )
-      nationalByPeriod[id] = nationalAvg
+      const englandTotal = Object.values(totals).reduce((s, v) => s + v, 0)
+      const nationalAvg  = Math.round(englandTotal / practiceCount)
+      nationalByPeriod[id]     = nationalAvg
+      englandTotalByPeriod[id] = englandTotal
 
       // Merge into per-practice store
       for (const [code, size] of Object.entries(totals)) {
@@ -446,6 +448,7 @@ async function main() {
     sourceUrl:      'https://digital.nhs.uk/data-and-information/publications/statistical/patients-registered-at-a-gp-practice',
     periods:        periodsOut,
     nationalAverages,
+    englandTotals:  allPeriodIds.map(id => englandTotalByPeriod[id] ?? null),
     practices,
   }
 
