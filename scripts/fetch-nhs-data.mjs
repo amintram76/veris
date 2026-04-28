@@ -151,16 +151,29 @@ function parseAllPatientsCSV(csvText) {
 
   // Normalise headers
   const raw = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, '').toUpperCase())
-  const col = name => raw.findIndex(h => h === name || h.includes(name))
+  // Prefer exact match, then partial match (avoids e.g. CODE matching SUB_ICB_LOCATION_CODE first)
+  const col = (...names) => {
+    for (const name of names) {
+      const idx = raw.findIndex(h => h === name)
+      if (idx >= 0) return idx
+    }
+    for (const name of names) {
+      const idx = raw.findIndex(h => h.includes(name))
+      if (idx >= 0) return idx
+    }
+    return -1
+  }
 
-  const iCode     = col('ORG_CODE')
-  const iType     = col('ORG_TYPE')
+  // Current format: CODE, TYPE, SEX, AGE, NUMBER_OF_PATIENTS
+  // Legacy format:  ORG_CODE, ORG_TYPE, SEX, AGE, NUMBER_OF_PATIENTS
+  const iCode     = col('CODE', 'ORG_CODE')
+  const iType     = col('TYPE', 'ORG_TYPE')
   const iSex      = col('SEX')
   const iAge      = col('AGE')
   const iPatients = col('NUMBER_OF_PATIENTS')
 
   if (iCode < 0 || iPatients < 0) {
-    console.warn('    ⚠  Unexpected CSV format — missing ORG_CODE or NUMBER_OF_PATIENTS')
+    console.warn(`    ⚠  Unexpected CSV format — headers: ${raw.slice(0, 10).join(', ')}`)
     return {}
   }
 
@@ -228,12 +241,25 @@ function parseMappingCSV(csvText) {
   if (lines.length < 2) return {}
 
   const raw = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, '').toUpperCase())
-  const col = (...candidates) => raw.findIndex(h => candidates.some(c => h.includes(c)))
+  // Prefer exact match, then partial match
+  const col = (...names) => {
+    for (const name of names) {
+      const idx = raw.findIndex(h => h === name)
+      if (idx >= 0) return idx
+    }
+    for (const name of names) {
+      const idx = raw.findIndex(h => h.includes(name))
+      if (idx >= 0) return idx
+    }
+    return -1
+  }
 
-  const iCode     = col('ORG_CODE', 'CODE')
-  const iName     = col('NAME', 'ORG_NAME')
-  const iPost     = col('POSTCODE', 'POST')
-  // ICB / commissioner name — column label has varied over the years
+  // Current format: PRACTICE_CODE, PRACTICE_NAME, PRACTICE_POSTCODE, ICB_NAME
+  // Legacy format:  ORG_CODE / CODE, NAME / ORG_NAME, POSTCODE
+  const iCode     = col('PRACTICE_CODE', 'ORG_CODE', 'CODE')
+  const iName     = col('PRACTICE_NAME', 'ORG_NAME', 'NAME')
+  const iPost     = col('PRACTICE_POSTCODE', 'POSTCODE', 'POST')
+  // ICB name — column label has varied over the years
   const iIcb      = col('ICB_NAME', 'COMMISSIONER_ORG_NAME', 'COMM_NAME', 'ICB')
 
   if (iCode < 0 || iName < 0) {
