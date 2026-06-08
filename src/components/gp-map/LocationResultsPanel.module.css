@@ -149,6 +149,18 @@
   font-variant-numeric: tabular-nums;
 }
 
+.siteLabel {
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #1e40af;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 4px;
+  padding: 0.1rem 0.3rem;
+}
+
 /* ── Practice info column ───────────────────────────────────────── */
 .infoCol {
   display: flex;
@@ -169,6 +181,14 @@
 .meta {
   font-size: 0.74rem;
   color: var(--ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.branchName {
+  font-size: 0.74rem;
+  color: #1e40af;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

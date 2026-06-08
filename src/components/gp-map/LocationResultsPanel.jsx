@@ -1,13 +1,31 @@
 import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { pointInGeoJSON, formatDistKm } from '../../utils/geoUtils'
+import { haversineKm, pointInGeoJSON, formatDistKm } from '../../utils/geoUtils'
+import branchLocations from '../../data/gpBranchLocations.json'
 import styles from './LocationResultsPanel.module.css'
 
+// ── Nearest site ──────────────────────────────────────────────────────────
+// For a given practice and click location, return the closest physical site
+// (either the admin-address centroid or any branch surgery).
+// Returns { distKm, label } where label is null for admin address or the branch name.
+function nearestSite(lat, lng, practiceCode, adminDistKm) {
+  const branches = branchLocations[practiceCode] ?? []
+  let best = { distKm: adminDistKm, label: null }
+  for (const b of branches) {
+    const d = haversineKm(lat, lng, b.lat, b.lng)
+    if (d < best.distKm) {
+      best = { distKm: d, label: b.name }
+    }
+  }
+  return best
+}
+
 // ── ResultRow ─────────────────────────────────────────────────────────────
-function ResultRow({ result, selectedPractices, onAdd }) {
+function ResultRow({ result, location, selectedPractices, onAdd }) {
   const { practice, distKm } = result
+  const site      = nearestSite(location.lat, location.lng, practice.code, distKm)
   const isSelected = selectedPractices.some(p => p.code === practice.code)
-  const icbLabel = (practice.icb ?? '')
+  const icbLabel   = (practice.icb ?? '')
     .replace(/^NHS /, '')
     .replace(/ Integrated Care Board$/, '')
     .replace(/ ICB$/, '')
@@ -15,7 +33,12 @@ function ResultRow({ result, selectedPractices, onAdd }) {
   return (
     <div className={styles.row}>
       <div className={styles.distCol}>
-        <span className={styles.dist}>{formatDistKm(distKm)}</span>
+        <span className={styles.dist}>{formatDistKm(site.distKm)}</span>
+        {site.label && (
+          <span className={styles.siteLabel} title={`Nearest branch: ${site.label}`}>
+            branch
+          </span>
+        )}
       </div>
       <div className={styles.infoCol}>
         <span className={styles.name}>{practice.name}</span>
@@ -23,6 +46,9 @@ function ResultRow({ result, selectedPractices, onAdd }) {
           {practice.code}
           {icbLabel ? ` · ${icbLabel}` : ''}
         </span>
+        {site.label && (
+          <span className={styles.branchName}>📍 {site.label}</span>
+        )}
       </div>
       <div className={styles.actionCol}>
         {isSelected ? (
@@ -45,7 +71,7 @@ function ResultRow({ result, selectedPractices, onAdd }) {
 // ── LocationResultsPanel ──────────────────────────────────────────────────
 // Props:
 //   location          { lat, lng }
-//   results           [{ code, distKm, practice }] — all 50, sorted nearest-first
+//   results           [{ code, distKm, practice }] — 50 nearest by admin address
 //   selectedPractices already-mapped practices
 //   onAdd(practice)   add a practice to the map
 //   onClear()         dismiss the panel and remove the pin
@@ -56,7 +82,6 @@ export default function LocationResultsPanel({
   onAdd,
   onClear,
 }) {
-  // containmentByCode: { [code]: true | false } — populated async as GeoJSON loads
   const [containmentByCode, setContainmentByCode] = useState({})
   const [checkedCount,      setCheckedCount]      = useState(0)
 
@@ -65,7 +90,6 @@ export default function LocationResultsPanel({
   useEffect(() => {
     setContainmentByCode({})
     setCheckedCount(0)
-
     results.forEach(({ code }) => {
       fetch(`/gp-boundaries/${code}.geojson`)
         .then(r => (r.ok ? r.json() : null))
@@ -76,32 +100,37 @@ export default function LocationResultsPanel({
         .catch(() => {
           setContainmentByCode(prev => ({ ...prev, [code]: false }))
         })
-        .finally(() => {
-          setCheckedCount(prev => prev + 1)
-        })
+        .finally(() => setCheckedCount(prev => prev + 1))
     })
   }, [locationKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const allChecked = checkedCount >= results.length
 
-  // Split into two groups:
-  // 1. Any practice (from the full 50) whose catchment contains the point
-  // 2. The top 10 nearest that don't contain the point
+  // Compute nearest-site distances for ALL 50 results (synchronous, in-memory)
+  const nearestSiteDistByCode = useMemo(() => {
+    const map = {}
+    for (const { code, distKm, practice } of results) {
+      map[code] = nearestSite(location.lat, location.lng, practice.code, distKm).distKm
+    }
+    return map
+  }, [results, location])
+
+  // Split: catchment matches (any from 50) vs nearest non-matching (top 10 by nearest-site dist)
   const { containing, nearest } = useMemo(() => {
     const containing = results
       .filter(r => containmentByCode[r.code] === true)
-      .sort((a, b) => a.distKm - b.distKm)
+      .sort((a, b) => (nearestSiteDistByCode[a.code] ?? a.distKm) - (nearestSiteDistByCode[b.code] ?? b.distKm))
 
     const containingCodes = new Set(containing.map(r => r.code))
     const nearest = results
       .filter(r => !containingCodes.has(r.code))
+      .sort((a, b) => (nearestSiteDistByCode[a.code] ?? a.distKm) - (nearestSiteDistByCode[b.code] ?? b.distKm))
       .slice(0, 10)
 
     return { containing, nearest }
-  }, [results, containmentByCode])
+  }, [results, containmentByCode, nearestSiteDistByCode])
 
   const containingCount = containing.length
-
   const subtitleText = allChecked
     ? containingCount === 0
       ? 'No registered catchment covers this point'
@@ -130,7 +159,7 @@ export default function LocationResultsPanel({
         </button>
       </div>
 
-      {/* ── Section 1: catchment matches ──────────────────────────── */}
+      {/* ── Catchment matches ────────────────────────────────────── */}
       {containing.length > 0 && (
         <>
           <div className={styles.sectionHeader}>
@@ -139,9 +168,10 @@ export default function LocationResultsPanel({
           </div>
           <div className={styles.rows}>
             {containing.map(result => (
-              <div key={result.code} className={`${styles.rowContains}`}>
+              <div key={result.code} className={styles.rowContains}>
                 <ResultRow
                   result={result}
+                  location={location}
                   selectedPractices={selectedPractices}
                   onAdd={onAdd}
                 />
@@ -151,7 +181,7 @@ export default function LocationResultsPanel({
         </>
       )}
 
-      {/* Loading state for catchment section (before first results) */}
+      {/* Loading indicator */}
       {!allChecked && containing.length === 0 && (
         <div className={styles.sectionHeader}>
           <span className={styles.loadingDot} />
@@ -159,36 +189,34 @@ export default function LocationResultsPanel({
         </div>
       )}
 
-      {/* ── Section 2: nearest by address ─────────────────────────── */}
+      {/* ── Nearest by site distance ──────────────────────────────── */}
       <div className={styles.sectionHeader}>
         <span className={styles.sectionDot} style={{ background: '#6b7280' }} />
         {containing.length > 0
-          ? 'Other nearby practices (by registered address)'
-          : '10 nearest practices by registered address'}
+          ? 'Other nearby practices'
+          : '10 nearest practices'}
       </div>
       <div className={styles.rows}>
         {nearest.map(result => (
           <ResultRow
             key={result.code}
             result={result}
+            location={location}
             selectedPractices={selectedPractices}
             onAdd={onAdd}
           />
         ))}
         {nearest.length === 0 && allChecked && (
-          <p className={styles.emptyNearby}>
-            All nearby practices are already shown above.
-          </p>
+          <p className={styles.emptyNearby}>All nearby practices are shown above.</p>
         )}
       </div>
 
       {/* Footer note */}
       <p className={styles.footerNote}>
-        Catchment check covers the 50 nearest practices by registered address.
-        Distances shown are straight-line from the administrative address, not nearest surgery site.
+        Catchment check covers 50 nearest practices. Where a branch surgery is closer than the
+        main address, the branch distance and location are shown. Distances are straight-line.
       </p>
 
-      {/* Cross-link */}
       {listSizesUrl && (
         <div className={styles.footer}>
           <Link to={listSizesUrl} className={styles.crossLinkBtn}>
