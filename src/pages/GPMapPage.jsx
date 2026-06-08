@@ -44,7 +44,9 @@ export default function GPMapPage() {
   // Click-to-search: compute nearest 10 synchronously from centroid index
   function handleMapClick({ lat, lng }) {
     setClickedLocation({ lat, lng })
-    const nearest = nearestByCentroid(lat, lng, centroids, 10)
+    // Check the nearest 50 by centroid — all 50 boundaries are tested for containment,
+    // but only the matching ones + top 10 by distance are displayed.
+    const nearest = nearestByCentroid(lat, lng, centroids, 50)
     const results = nearest
       .map(({ code, distKm }) => {
         const practice = getPracticeByCode(code)
