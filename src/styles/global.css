@@ -124,6 +124,10 @@ img {
   /* Remove animations */
   * { animation: none !important; transition: none !important; }
 
+  /* Hide Recharts tooltip and active-dot hover state */
+  .recharts-tooltip-wrapper,
+  .recharts-active-dot { display: none !important; }
+
   /* Ensure cards and tables print cleanly */
   .container, .container--narrow {
     max-width: none !important;
