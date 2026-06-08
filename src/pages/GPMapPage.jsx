@@ -10,6 +10,7 @@ import PracticeSelector from '../components/gp-list-size/PracticeSelector'
 import MapView from '../components/gp-map/MapView'
 import LocationResultsPanel from '../components/gp-map/LocationResultsPanel'
 import centroids from '../data/gpBoundaryCentroids.json'
+import practiceAddresses from '../data/gpPracticeAddresses.json'
 import styles from './GPMapPage.module.css'
 import contentStyles from './ContentPage.module.css'
 
@@ -44,9 +45,9 @@ export default function GPMapPage() {
   // Click-to-search: compute nearest 10 synchronously from centroid index
   function handleMapClick({ lat, lng }) {
     setClickedLocation({ lat, lng })
-    // Check the nearest 50 by centroid — all 50 boundaries are tested for containment,
-    // but only the matching ones + top 10 by distance are displayed.
-    const nearest = nearestByCentroid(lat, lng, centroids, 50)
+    // Rank by actual practice address where available; fall back to polygon centroid.
+    // Check 50 boundaries for containment; display matching ones + top 10 by distance.
+    const nearest = nearestByCentroid(lat, lng, centroids, 50, practiceAddresses)
     const results = nearest
       .map(({ code, distKm }) => {
         const practice = getPracticeByCode(code)

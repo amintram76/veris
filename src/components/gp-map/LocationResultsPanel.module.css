@@ -149,17 +149,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.siteLabel {
-  font-size: 0.64rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #1e40af;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 4px;
-  padding: 0.1rem 0.3rem;
-}
 
 /* ── Practice info column ───────────────────────────────────────── */
 .infoCol {
@@ -186,12 +175,40 @@
   text-overflow: ellipsis;
 }
 
-.branchName {
-  font-size: 0.74rem;
-  color: #1e40af;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* Surgery site list within a row */
+.sites {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-top: 0.25rem;
+}
+
+.site {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.73rem;
+  color: var(--ink-muted);
+  line-height: 1.4;
+}
+
+.siteDot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+.siteDist {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  color: var(--ink-soft);
+  padding-left: 0.5rem;
+  flex-shrink: 0;
 }
 
 /* ── Action column ──────────────────────────────────────────────── */

@@ -40,12 +40,16 @@ export function pointInGeoJSON(lat, lng, geojson) {
   return false
 }
 
-// ── Nearest practices by centroid distance ────────────────────────────────
-// centroids: { [code]: [lat, lng] }
+// ── Nearest practices by location ─────────────────────────────────────────
+// centroids:  { [code]: [lat, lng] }  — polygon centroids (fallback)
+// addresses:  { [code]: [lat, lng] }  — actual practice addresses (preferred)
 // Returns [{ code, distKm }] sorted ascending, capped at n.
-export function nearestByCentroid(lat, lng, centroids, n = 10) {
+export function nearestByCentroid(lat, lng, centroids, n = 10, addresses = {}) {
   return Object.entries(centroids)
-    .map(([code, [clat, clng]]) => ({ code, distKm: haversineKm(lat, lng, clat, clng) }))
+    .map(([code, centroid]) => {
+      const [clat, clng] = addresses[code] ?? centroid
+      return { code, distKm: haversineKm(lat, lng, clat, clng) }
+    })
     .sort((a, b) => a.distKm - b.distKm)
     .slice(0, n)
 }

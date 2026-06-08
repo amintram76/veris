@@ -9,6 +9,7 @@ import {
 } from 'react-leaflet'
 import L from 'leaflet'
 import { CHART_COLORS } from '../../data/gpListSizeData'
+import practiceAddresses from '../../data/gpPracticeAddresses.json'
 import ClickSearchLayer from './ClickSearchLayer'
 import styles from './MapView.module.css'
 
@@ -72,7 +73,8 @@ function PracticeBoundary({ practice, color, centroids, onBoundsLoaded }) {
     return () => { cancelled = true }
   }, [practice.code]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const center   = centroids[practice.code]
+  // Prefer actual practice address; fall back to polygon centroid
+  const center = practiceAddresses[practice.code] ?? centroids[practice.code]
   const icbLabel = (practice.icb ?? '')
     .replace(/^NHS /, '')
     .replace(/ Integrated Care Board$/, '')

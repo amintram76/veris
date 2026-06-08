@@ -2,54 +2,81 @@ import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { haversineKm, pointInGeoJSON, formatDistKm } from '../../utils/geoUtils'
 import branchLocations from '../../data/gpBranchLocations.json'
+import practiceAddresses from '../../data/gpPracticeAddresses.json'
 import styles from './LocationResultsPanel.module.css'
 
-// ── Nearest site ──────────────────────────────────────────────────────────
-// For a given practice and click location, return the closest physical site
-// (either the admin-address centroid or any branch surgery).
-// Returns { distKm, label } where label is null for admin address or the branch name.
-function nearestSite(lat, lng, practiceCode, adminDistKm) {
-  const branches = branchLocations[practiceCode] ?? []
-  let best = { distKm: adminDistKm, label: null }
-  for (const b of branches) {
-    const d = haversineKm(lat, lng, b.lat, b.lng)
-    if (d < best.distKm) {
-      best = { distKm: d, label: b.name }
-    }
-  }
-  return best
+// ── Site distances ────────────────────────────────────────────────────────
+// For a given practice and click location, return:
+//   actualDistKm  — distance to the actual practice address (null if unknown)
+//   nearestDistKm — nearest of actual address and all branches
+//   branches      — all branches with distKm, sorted nearest-first
+function sitesForPractice(lat, lng, practiceCode, fallbackDistKm) {
+  const addr    = practiceAddresses[practiceCode]
+  const actualDistKm = addr ? haversineKm(lat, lng, addr[0], addr[1]) : null
+
+  const branches = (branchLocations[practiceCode] ?? []).map(b => ({
+    ...b,
+    distKm: haversineKm(lat, lng, b.lat, b.lng),
+  })).sort((a, b) => a.distKm - b.distKm)
+
+  const baseDist = actualDistKm ?? fallbackDistKm
+  const nearestDistKm = branches.reduce((best, b) => Math.min(best, b.distKm), baseDist)
+
+  return { actualDistKm, nearestDistKm, branches }
 }
 
 // ── ResultRow ─────────────────────────────────────────────────────────────
 function ResultRow({ result, location, selectedPractices, onAdd }) {
-  const { practice, distKm } = result
-  const site      = nearestSite(location.lat, location.lng, practice.code, distKm)
+  const { practice, distKm: fallbackDistKm } = result
+  const { actualDistKm, nearestDistKm, branches } = useMemo(
+    () => sitesForPractice(location.lat, location.lng, practice.code, fallbackDistKm),
+    [location, practice.code, fallbackDistKm]
+  )
+
   const isSelected = selectedPractices.some(p => p.code === practice.code)
   const icbLabel   = (practice.icb ?? '')
     .replace(/^NHS /, '')
     .replace(/ Integrated Care Board$/, '')
     .replace(/ ICB$/, '')
 
+  // Distance shown in the lead column: nearest physical site
+  const displayDist = actualDistKm != null ? actualDistKm : fallbackDistKm
+
   return (
     <div className={styles.row}>
+      {/* Distance to nearest site */}
       <div className={styles.distCol}>
-        <span className={styles.dist}>{formatDistKm(site.distKm)}</span>
-        {site.label && (
-          <span className={styles.siteLabel} title={`Nearest branch: ${site.label}`}>
-            branch
-          </span>
-        )}
+        <span className={styles.dist}>{formatDistKm(nearestDistKm)}</span>
       </div>
+
+      {/* Practice info + site breakdown */}
       <div className={styles.infoCol}>
         <span className={styles.name}>{practice.name}</span>
         <span className={styles.meta}>
           {practice.code}
           {icbLabel ? ` · ${icbLabel}` : ''}
         </span>
-        {site.label && (
-          <span className={styles.branchName}>📍 {site.label}</span>
-        )}
+
+        {/* Surgery sites */}
+        <div className={styles.sites}>
+          <span className={styles.site}>
+            <span className={styles.siteDot} />
+            Main surgery
+            <span className={styles.siteDist}>
+              {actualDistKm != null ? formatDistKm(actualDistKm) : formatDistKm(displayDist)}
+            </span>
+          </span>
+          {branches.map(b => (
+            <span key={b.code} className={styles.site}>
+              <span className={styles.siteDot} />
+              {b.name}
+              <span className={styles.siteDist}>{formatDistKm(b.distKm)}</span>
+            </span>
+          ))}
+        </div>
       </div>
+
+      {/* Action */}
       <div className={styles.actionCol}>
         {isSelected ? (
           <span className={styles.onMap}>On map</span>
@@ -69,12 +96,6 @@ function ResultRow({ result, location, selectedPractices, onAdd }) {
 }
 
 // ── LocationResultsPanel ──────────────────────────────────────────────────
-// Props:
-//   location          { lat, lng }
-//   results           [{ code, distKm, practice }] — 50 nearest by admin address
-//   selectedPractices already-mapped practices
-//   onAdd(practice)   add a practice to the map
-//   onClear()         dismiss the panel and remove the pin
 export default function LocationResultsPanel({
   location,
   results,
@@ -106,29 +127,29 @@ export default function LocationResultsPanel({
 
   const allChecked = checkedCount >= results.length
 
-  // Compute nearest-site distances for ALL 50 results (synchronous, in-memory)
-  const nearestSiteDistByCode = useMemo(() => {
+  // Nearest-site distances for sorting (synchronous, in-memory)
+  const nearestDistByCode = useMemo(() => {
     const map = {}
     for (const { code, distKm, practice } of results) {
-      map[code] = nearestSite(location.lat, location.lng, practice.code, distKm).distKm
+      map[code] = sitesForPractice(location.lat, location.lng, practice.code, distKm).nearestDistKm
     }
     return map
   }, [results, location])
 
-  // Split: catchment matches (any from 50) vs nearest non-matching (top 10 by nearest-site dist)
+  // Split into: catchment matches (any from 50) | nearest 10 non-matching
   const { containing, nearest } = useMemo(() => {
     const containing = results
       .filter(r => containmentByCode[r.code] === true)
-      .sort((a, b) => (nearestSiteDistByCode[a.code] ?? a.distKm) - (nearestSiteDistByCode[b.code] ?? b.distKm))
+      .sort((a, b) => (nearestDistByCode[a.code] ?? a.distKm) - (nearestDistByCode[b.code] ?? b.distKm))
 
     const containingCodes = new Set(containing.map(r => r.code))
     const nearest = results
       .filter(r => !containingCodes.has(r.code))
-      .sort((a, b) => (nearestSiteDistByCode[a.code] ?? a.distKm) - (nearestSiteDistByCode[b.code] ?? b.distKm))
+      .sort((a, b) => (nearestDistByCode[a.code] ?? a.distKm) - (nearestDistByCode[b.code] ?? b.distKm))
       .slice(0, 10)
 
     return { containing, nearest }
-  }, [results, containmentByCode, nearestSiteDistByCode])
+  }, [results, containmentByCode, nearestDistByCode])
 
   const containingCount = containing.length
   const subtitleText = allChecked
@@ -159,7 +180,7 @@ export default function LocationResultsPanel({
         </button>
       </div>
 
-      {/* ── Catchment matches ────────────────────────────────────── */}
+      {/* Catchment matches */}
       {containing.length > 0 && (
         <>
           <div className={styles.sectionHeader}>
@@ -169,19 +190,13 @@ export default function LocationResultsPanel({
           <div className={styles.rows}>
             {containing.map(result => (
               <div key={result.code} className={styles.rowContains}>
-                <ResultRow
-                  result={result}
-                  location={location}
-                  selectedPractices={selectedPractices}
-                  onAdd={onAdd}
-                />
+                <ResultRow result={result} location={location} selectedPractices={selectedPractices} onAdd={onAdd} />
               </div>
             ))}
           </div>
         </>
       )}
 
-      {/* Loading indicator */}
       {!allChecked && containing.length === 0 && (
         <div className={styles.sectionHeader}>
           <span className={styles.loadingDot} />
@@ -189,32 +204,22 @@ export default function LocationResultsPanel({
         </div>
       )}
 
-      {/* ── Nearest by site distance ──────────────────────────────── */}
+      {/* Nearest by site distance */}
       <div className={styles.sectionHeader}>
         <span className={styles.sectionDot} style={{ background: '#6b7280' }} />
-        {containing.length > 0
-          ? 'Other nearby practices'
-          : '10 nearest practices'}
+        {containing.length > 0 ? 'Other nearby practices' : '10 nearest practices'}
       </div>
       <div className={styles.rows}>
         {nearest.map(result => (
-          <ResultRow
-            key={result.code}
-            result={result}
-            location={location}
-            selectedPractices={selectedPractices}
-            onAdd={onAdd}
-          />
+          <ResultRow key={result.code} result={result} location={location} selectedPractices={selectedPractices} onAdd={onAdd} />
         ))}
         {nearest.length === 0 && allChecked && (
           <p className={styles.emptyNearby}>All nearby practices are shown above.</p>
         )}
       </div>
 
-      {/* Footer note */}
       <p className={styles.footerNote}>
-        Catchment check covers 50 nearest practices. Where a branch surgery is closer than the
-        main address, the branch distance and location are shown. Distances are straight-line.
+        Distances are straight-line to each surgery site. Catchment check covers 50 nearest practices.
       </p>
 
       {listSizesUrl && (
