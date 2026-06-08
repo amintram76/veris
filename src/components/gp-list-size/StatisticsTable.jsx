@@ -1,4 +1,3 @@
-import { computeStats } from '../../services/gpListSizeService'
 import { CHART_COLORS } from '../../data/gpListSizeData'
 import styles from './StatisticsTable.module.css'
 
@@ -35,12 +34,21 @@ function VsPpCell({ value }) {
   )
 }
 
-export default function StatisticsTable({ selectedPractices, fromIndex, toIndex, periods, isLiveData }) {
-  const rows = computeStats(selectedPractices, fromIndex, toIndex)
+/**
+ * @param {Array}  stats           - output of computeStats()
+ * @param {Array}  periods         - full periods array
+ * @param {number} fromIndex
+ * @param {number} toIndex
+ * @param {boolean} isLiveData
+ * @param {object} visibleColumns  - { icb, listStart, listEnd, changePct, englandPct, vsPp }
+ */
+export default function StatisticsTable({ stats, periods, fromIndex, toIndex, isLiveData, visibleColumns = {} }) {
+  const rows = stats ?? []
   const startLabel = periods[fromIndex]?.label
   const endLabel   = periods[toIndex]?.label
 
-  // englandChangePct is the same for every row — pull from the first
+  const col = key => visibleColumns[key] !== false  // default visible
+
   const englandChangePct = rows[0]?.englandChangePct ?? null
   const anyMerger = rows.some(r => r.hasMerger)
 
@@ -58,12 +66,12 @@ export default function StatisticsTable({ selectedPractices, fromIndex, toIndex,
           <thead>
             <tr>
               <th className={styles.thPractice}>Practice</th>
-              <th className={styles.th}>ICB</th>
-              <th className={styles.thNum}>List size ({startLabel})</th>
-              <th className={styles.thNum}>List size ({endLabel})</th>
-              <th className={styles.thNum}>% change</th>
-              <th className={styles.thNum}>England pop. % change</th>
-              <th className={styles.thNum}>vs. England</th>
+              {col('icb')        && <th className={styles.th}>ICB</th>}
+              {col('listStart')  && <th className={styles.thNum}>List size ({startLabel})</th>}
+              {col('listEnd')    && <th className={styles.thNum}>List size ({endLabel})</th>}
+              {col('changePct')  && <th className={styles.thNum}>% change</th>}
+              {col('englandPct') && <th className={styles.thNum}>England pop. % change</th>}
+              {col('vsPp')       && <th className={styles.thNum}>vs. England</th>}
             </tr>
           </thead>
           <tbody>
@@ -76,12 +84,12 @@ export default function StatisticsTable({ selectedPractices, fromIndex, toIndex,
                     <span className={styles.practiceCode}>{practice.code}</span>
                   </span>
                 </td>
-                <td className={styles.td}>{(practice.icb ?? '').replace('NHS ', '').replace(' ICB', '')}</td>
-                <td className={styles.tdNum}>{fmt(start)}</td>
-                <td className={styles.tdNum}>{fmt(end)}</td>
-                <td className={styles.tdNum}><PctCell value={changePct} adjusted={hasMerger} /></td>
-                <td className={styles.tdNum}><PctCell value={rowEngland} /></td>
-                <td className={styles.tdNum}><VsPpCell value={vsPp} /></td>
+                {col('icb')        && <td className={styles.td}>{(practice.icb ?? '').replace('NHS ', '').replace(' ICB', '')}</td>}
+                {col('listStart')  && <td className={styles.tdNum}>{fmt(start)}</td>}
+                {col('listEnd')    && <td className={styles.tdNum}>{fmt(end)}</td>}
+                {col('changePct')  && <td className={styles.tdNum}><PctCell value={changePct} adjusted={hasMerger} /></td>}
+                {col('englandPct') && <td className={styles.tdNum}><PctCell value={rowEngland} /></td>}
+                {col('vsPp')       && <td className={styles.tdNum}><VsPpCell value={vsPp} /></td>}
               </tr>
             ))}
           </tbody>
@@ -110,7 +118,7 @@ export default function StatisticsTable({ selectedPractices, fromIndex, toIndex,
 
       {!isLiveData && (
         <p className={styles.source}>
-          Illustrative sample data — run <code>node scripts/fetch-nhs-data.mjs</code> or deploy to Netlify to load live NHS England data.
+          Illustrative sample data — run <code>node scripts/fetch-nhs-data.mjs</code> to load live NHS England data.
         </p>
       )}
     </div>

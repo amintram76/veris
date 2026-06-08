@@ -1,0 +1,161 @@
+.bar {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-bottom: var(--space-sm);
+}
+
+/* Buttons */
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.82rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  color: var(--green-deep);
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.btnSecondary:hover {
+  background: var(--surface-alt);
+  border-color: var(--green-mid);
+}
+
+.icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Modal overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 46, 34, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-md);
+}
+
+/* Dialog box */
+.dialog {
+  background: var(--surface-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(26, 46, 34, 0.18);
+}
+
+.dialogTitle {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+}
+
+.dialogHint {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  line-height: 1.5;
+  margin-bottom: var(--space-md);
+}
+
+/* Fieldsets */
+.fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 var(--space-md);
+}
+
+.legend {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 0.6rem;
+}
+
+.alwaysOn {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  font-style: italic;
+  margin-bottom: 0.4rem;
+}
+
+.checkLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+  padding: 0.25rem 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkLabel:hover {
+  color: var(--ink);
+}
+
+.check {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--green-deep);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Dialog actions */
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+}
+
+.btnGhost {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  color: var(--ink-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.btnGhost:hover {
+  background: var(--surface-alt);
+}
+
+.btnPrimary {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: #fff;
+  background: var(--green-deep);
+  border: 1px solid var(--green-deep);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.btnPrimary:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+}

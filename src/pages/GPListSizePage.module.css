@@ -154,6 +154,45 @@
   text-decoration: underline;
 }
 
+/* ── Print-only header (hidden on screen) ───────────────────── */
+.printHeader {
+  display: none;
+}
+
+.printTitle {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 0.25rem;
+}
+
+.printMeta {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  margin-bottom: 0.15rem;
+}
+
+.printSource {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Chart hidden in print when user opts out */
+.hideInPrint {
+  /* visible on screen regardless */
+}
+
+@media print {
+  .hideInPrint { display: none !important; }
+  .printHeader { display: block !important; }
+  .toolSection { padding: 0 !important; }
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .controls {
     padding: var(--space-md);
