@@ -9,6 +9,7 @@ import {
 } from 'react-leaflet'
 import L from 'leaflet'
 import { CHART_COLORS } from '../../data/gpListSizeData'
+import ClickSearchLayer from './ClickSearchLayer'
 import styles from './MapView.module.css'
 
 const ENGLAND_CENTER = [52.8, -1.6]
@@ -117,7 +118,7 @@ function PracticeBoundary({ practice, color, centroids, onBoundsLoaded }) {
 }
 
 // ── MapView ───────────────────────────────────────────────────────────────
-export default function MapView({ selectedPractices, centroids }) {
+export default function MapView({ selectedPractices, centroids, clickedLocation, onMapClick }) {
   const [boundsByCode, setBoundsByCode] = useState({})
 
   // Remove bounds for practices that have been deselected
@@ -163,6 +164,11 @@ export default function MapView({ selectedPractices, centroids }) {
           practices={selectedPractices}
           boundsByCode={boundsByCode}
           centroids={centroids}
+        />
+
+        <ClickSearchLayer
+          clickedLocation={clickedLocation}
+          onMapClick={onMapClick}
         />
       </MapContainer>
     </div>

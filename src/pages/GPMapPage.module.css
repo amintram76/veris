@@ -123,6 +123,14 @@
   line-height: 1.7;
 }
 
+/* Map click-to-search hint */
+.mapHint {
+  margin-top: var(--space-sm);
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+
 @media (max-width: 768px) {
   .controls { padding: var(--space-md); }
   .emptyState { padding: var(--space-xl) var(--space-sm); }
