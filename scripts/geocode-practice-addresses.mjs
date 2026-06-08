@@ -14,7 +14,7 @@
  * Run: node scripts/geocode-practice-addresses.mjs
  */
 
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 
@@ -22,6 +22,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT      = resolve(__dirname, '..')
 const DATA_PATH = resolve(ROOT, 'src/data/nhsData.generated.json')
 const OUT_PATH  = resolve(ROOT, 'src/data/gpPracticeAddresses.json')
+const META_PATH = resolve(ROOT, 'src/data/gpDataMeta.json')
 
 function normalisePostcode(raw) {
   return (raw ?? '').replace(/\s+/g, '').toUpperCase()
@@ -108,6 +109,13 @@ async function main() {
   console.log(`  ${found} practices geocoded, ${missing} postcodes not found`)
   writeFileSync(OUT_PATH, JSON.stringify(addresses))
   console.log(`\nWritten → src/data/gpPracticeAddresses.json`)
+
+  // Update metadata timestamp
+  const today = new Date().toISOString().slice(0, 10)
+  const meta  = existsSync(META_PATH) ? JSON.parse(readFileSync(META_PATH, 'utf8')) : {}
+  meta.addressesGeneratedAt = today
+  writeFileSync(META_PATH, JSON.stringify(meta))
+  console.log(`Updated gpDataMeta.json — addressesGeneratedAt: ${today}`)
 }
 
 main().catch(e => {

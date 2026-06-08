@@ -262,6 +262,11 @@
   line-height: 1.5;
 }
 
+.footerLink {
+  color: var(--green-deep);
+  text-decoration: underline;
+}
+
 /* ── Footer cross-link ──────────────────────────────────────────── */
 .footer {
   padding: var(--space-sm) var(--space-lg);

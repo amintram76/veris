@@ -11,6 +11,7 @@ import MapView from '../components/gp-map/MapView'
 import LocationResultsPanel from '../components/gp-map/LocationResultsPanel'
 import centroids from '../data/gpBoundaryCentroids.json'
 import practiceAddresses from '../data/gpPracticeAddresses.json'
+import gpDataMeta from '../data/gpDataMeta.json'
 import styles from './GPMapPage.module.css'
 import contentStyles from './ContentPage.module.css'
 
@@ -72,6 +73,10 @@ export default function GPMapPage() {
     ? new Date(dataGeneratedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
     : null
 
+  const branchDataDate = gpDataMeta.branchesGeneratedAt
+    ? new Date(gpDataMeta.branchesGeneratedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+    : null
+
   return (
     <div className="page-enter">
       <section className={contentStyles.pageHero} data-no-print>
@@ -98,6 +103,14 @@ export default function GPMapPage() {
             <span>
               <strong>Boundary data</strong> — GP practice catchment boundaries from SCW CSU.
               {isLiveData && refreshedDate && <> Patient register last refreshed {refreshedDate}.</>}
+              {branchDataDate && (
+                <>
+                  {' '}<strong>Branch surgery data</strong> from NHS ODS, last fetched {branchDataDate}.{' '}
+                  Branch records depend on practices notifying NHS ODS of changes —
+                  closures may not be reflected immediately.{' '}
+                  <a href="https://find-a-gp.nhs.uk" target="_blank" rel="noopener noreferrer">Verify on NHS website ↗</a>
+                </>
+              )}
             </span>
           </div>
 

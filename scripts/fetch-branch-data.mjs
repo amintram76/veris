@@ -25,13 +25,14 @@
  * Run:  node scripts/fetch-branch-data.mjs
  */
 
-import { writeFileSync } from 'fs'
+import { writeFileSync, existsSync, readFileSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT      = resolve(__dirname, '..')
 const OUT_PATH  = resolve(ROOT, 'src/data/gpBranchLocations.json')
+const META_PATH = resolve(ROOT, 'src/data/gpDataMeta.json')
 
 const EBRANCHS_URL = 'https://www.odsdatasearchandexport.nhs.uk/api/getReport?report=ebranchs'
 
@@ -188,6 +189,13 @@ async function main() {
   // 5. Write
   writeFileSync(OUT_PATH, JSON.stringify(byParent))
   console.log(`\nWritten → src/data/gpBranchLocations.json`)
+
+  // Update metadata timestamp
+  const today = new Date().toISOString().slice(0, 10)
+  const meta  = existsSync(META_PATH) ? JSON.parse(readFileSync(META_PATH, 'utf8')) : {}
+  meta.branchesGeneratedAt = today
+  writeFileSync(META_PATH, JSON.stringify(meta))
+  console.log(`Updated gpDataMeta.json — branchesGeneratedAt: ${today}`)
 }
 
 main().catch(e => {

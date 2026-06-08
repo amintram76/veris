@@ -3,7 +3,12 @@ import { Link } from 'react-router-dom'
 import { haversineKm, pointInGeoJSON, formatDistKm } from '../../utils/geoUtils'
 import branchLocations from '../../data/gpBranchLocations.json'
 import practiceAddresses from '../../data/gpPracticeAddresses.json'
+import gpDataMeta from '../../data/gpDataMeta.json'
 import styles from './LocationResultsPanel.module.css'
+
+const branchDataDate = gpDataMeta.branchesGeneratedAt
+  ? new Date(gpDataMeta.branchesGeneratedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+  : null
 
 // ── Site distances ────────────────────────────────────────────────────────
 // For a given practice and click location, return:
@@ -220,6 +225,8 @@ export default function LocationResultsPanel({
 
       <p className={styles.footerNote}>
         Distances are straight-line to each surgery site. Catchment check covers 50 nearest practices.
+        Branch data from NHS ODS{branchDataDate ? ` (fetched ${branchDataDate})` : ''} — closures may not
+        be reflected immediately. <a href="https://find-a-gp.nhs.uk" target="_blank" rel="noopener noreferrer" className={styles.footerLink}>Verify on NHS website ↗</a>
       </p>
 
       {listSizesUrl && (
