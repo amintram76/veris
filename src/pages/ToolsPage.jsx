@@ -8,6 +8,12 @@ const tools = [
     tag: "Data & Analytics",
     link: "/tools/gp-list-sizes",
   },
+  {
+    title: "GP Practice boundary map",
+    description: "Explore registered catchment boundaries for GP practices across England. Search for one or more practices to view and compare their boundaries side by side on an interactive map.",
+    tag: "Mapping",
+    link: "/tools/gp-map",
+  },
 ]
 
 export default function ToolsPage() {

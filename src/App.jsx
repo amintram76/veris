@@ -3,6 +3,7 @@ import Layout from './components/Layout'
 import HomePage from './pages/HomePage'
 import ToolsPage from './pages/ToolsPage'
 import GPListSizePage from './pages/GPListSizePage'
+import GPMapPage from './pages/GPMapPage'
 import ArticlesPage from './pages/ArticlesPage'
 import AboutPage from './pages/AboutPage'
 import GetSupportPage from './pages/GetSupportPage'
@@ -16,6 +17,7 @@ export default function App() {
           <Route index element={<HomePage />} />
           <Route path="tools" element={<ToolsPage />} />
           <Route path="tools/gp-list-sizes" element={<GPListSizePage />} />
+          <Route path="tools/gp-map" element={<GPMapPage />} />
           <Route path="articles" element={<ArticlesPage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="get-support" element={<GetSupportPage />} />

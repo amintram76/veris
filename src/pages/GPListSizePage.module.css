@@ -154,6 +154,34 @@
   text-decoration: underline;
 }
 
+/* Cross-tool link row */
+.crossLink {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: var(--space-sm);
+}
+
+.crossLinkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--green-deep);
+  text-decoration: none;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.crossLinkBtn:hover {
+  background: var(--surface-alt);
+  border-color: var(--green-mid);
+  color: var(--green-deep);
+}
+
 /* ── Print-only header (hidden on screen) ───────────────────── */
 .printHeader {
   display: none;

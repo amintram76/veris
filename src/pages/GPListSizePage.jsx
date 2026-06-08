@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import {
   getAvailablePeriods,
   isLiveData,
   dataSource,
   dataGeneratedAt,
   computeStats,
+  getPracticeByCode,
 } from '../services/gpListSizeService'
 import PracticeSelector from '../components/gp-list-size/PracticeSelector'
 import TimeframeSelector from '../components/gp-list-size/TimeframeSelector'
@@ -27,11 +29,25 @@ const ALL_COLUMNS = {
 
 export default function GPListSizePage() {
   const [selectedPractices, setSelectedPractices] = useState([])
+  const [searchParams] = useSearchParams()
   const [fromIndex, setFromIndex]   = useState(0)
   const [toIndex, setToIndex]       = useState(periods.length - 1)
   const [visibleColumns, setVisibleColumns]       = useState(ALL_COLUMNS)
   const [printIncludeChart, setPrintIncludeChart] = useState(true)
   const [shouldPrint, setShouldPrint]             = useState(false)
+
+  // Pre-populate from ?practices=A81001,A81002 URL param (cross-tool linking)
+  useEffect(() => {
+    const param = searchParams.get('practices')
+    if (!param) return
+    const practices = param
+      .split(',')
+      .map(c => c.trim())
+      .filter(Boolean)
+      .map(code => getPracticeByCode(code))
+      .filter(Boolean)
+    if (practices.length > 0) setSelectedPractices(practices)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleAdd(practice) {
     setSelectedPractices(prev => [...prev, practice])
@@ -167,6 +183,16 @@ export default function GPListSizePage() {
 
           {hasData && (
             <>
+              {/* Cross-tool link */}
+              <div className={styles.crossLink} data-no-print>
+                <Link
+                  to={`/tools/gp-map?practices=${selectedPractices.map(p => p.code).join(',')}`}
+                  className={styles.crossLinkBtn}
+                >
+                  🗺 View boundaries on map →
+                </Link>
+              </div>
+
               {/* Export / print bar */}
               <ExportBar
                 stats={stats}

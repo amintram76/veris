@@ -50,6 +50,10 @@ export function getNationalAverages() {
   return activeNatAvgs
 }
 
+export function getPracticeByCode(code) {
+  return activePractices.find(p => p.code === code) ?? null
+}
+
 export function buildChartData(selectedPractices, fromIndex, toIndex) {
   const sliced = activePeriods.slice(fromIndex, toIndex + 1)
 
