@@ -14,48 +14,71 @@ import styles from './MapView.module.css'
 const ENGLAND_CENTER = [52.8, -1.6]
 const ENGLAND_ZOOM   = 6
 
-// ── FitBounds ─────────────────────────────────────────────────────────────
-// Re-centres the map whenever the set of selected practices changes.
-function FitBounds({ practices, centroids }) {
+// ── BoundsController ──────────────────────────────────────────────────────
+// Fits the map to the union of all loaded GeoJSON bounds, falling back to
+// centroids for any practice whose boundary hasn't loaded yet.
+function BoundsController({ practices, boundsByCode, centroids }) {
   const map = useMap()
-  const key = practices.map(p => p.code).join(',')
+  const practicesKey = practices.map(p => p.code).join(',')
+  const loadedKey    = Object.keys(boundsByCode).sort().join(',')
 
   useEffect(() => {
     if (practices.length === 0) return
-    const coords = practices.map(p => centroids[p.code]).filter(Boolean)
-    if (coords.length === 0) return
 
-    if (coords.length === 1) {
-      map.flyTo(coords[0], 13, { duration: 1.2 })
-    } else {
-      map.flyToBounds(L.latLngBounds(coords).pad(0.25), { duration: 1.2 })
+    let union = null
+
+    for (const p of practices) {
+      const b = boundsByCode[p.code]
+      if (b && b.isValid()) {
+        union = union
+          ? union.extend(b)
+          : L.latLngBounds(b.getSouthWest(), b.getNorthEast())
+      } else {
+        const c = centroids[p.code]
+        if (c) {
+          union = union ? union.extend(c) : L.latLngBounds([c, c])
+        }
+      }
     }
-  }, [key]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    if (!union || !union.isValid()) return
+    map.flyToBounds(union.pad(0.25), { duration: 1.0, maxZoom: 14 })
+  }, [practicesKey, loadedKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return null
 }
 
 // ── PracticeBoundary ──────────────────────────────────────────────────────
 // Fetches and renders a single practice's boundary + marker.
-function PracticeBoundary({ practice, color, centroids }) {
-  const [geojson, setGeojson]     = useState(null)
-  const [noData, setNoData]       = useState(false)
+// Calls onBoundsLoaded(code, L.LatLngBounds) once the GeoJSON is available.
+function PracticeBoundary({ practice, color, centroids, onBoundsLoaded }) {
+  const [geojson, setGeojson] = useState(null)
+  const [noData, setNoData]   = useState(false)
 
   useEffect(() => {
     let cancelled = false
     fetch(`/gp-boundaries/${practice.code}.geojson`)
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
-      .then(data => { if (!cancelled) setGeojson(data) })
+      .then(data => {
+        if (cancelled) return
+        setGeojson(data)
+        try {
+          const b = L.geoJSON(data).getBounds()
+          if (b.isValid()) onBoundsLoaded(practice.code, b)
+        } catch (_) { /* malformed geometry */ }
+      })
       .catch(() => { if (!cancelled) setNoData(true) })
     return () => { cancelled = true }
-  }, [practice.code])
+  }, [practice.code]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const center = centroids[practice.code]
-  const icbLabel = (practice.icb ?? '').replace(/^NHS /, '').replace(/ Integrated Care Board$/, '').replace(/ ICB$/, '')
+  const center   = centroids[practice.code]
+  const icbLabel = (practice.icb ?? '')
+    .replace(/^NHS /, '')
+    .replace(/ Integrated Care Board$/, '')
+    .replace(/ ICB$/, '')
 
   return (
     <>
-      {/* Boundary polygon */}
       {geojson && (
         <GeoJSON
           key={practice.code}
@@ -64,13 +87,12 @@ function PracticeBoundary({ practice, color, centroids }) {
             color,
             weight: 2,
             fillColor: color,
-            fillOpacity: 0.12,
+            fillOpacity: 0.15,
             opacity: 0.9,
           }}
         />
       )}
 
-      {/* Centroid marker */}
       {center && (
         <CircleMarker
           center={center}
@@ -90,15 +112,27 @@ function PracticeBoundary({ practice, color, centroids }) {
           </Popup>
         </CircleMarker>
       )}
-
-      {/* Marker for practices with no centroid but no boundary either */}
-      {!center && noData && null}
     </>
   )
 }
 
 // ── MapView ───────────────────────────────────────────────────────────────
 export default function MapView({ selectedPractices, centroids }) {
+  const [boundsByCode, setBoundsByCode] = useState({})
+
+  // Remove bounds for practices that have been deselected
+  const practicesKey = selectedPractices.map(p => p.code).join(',')
+  useEffect(() => {
+    setBoundsByCode(prev => {
+      const codes = new Set(selectedPractices.map(p => p.code))
+      return Object.fromEntries(Object.entries(prev).filter(([k]) => codes.has(k)))
+    })
+  }, [practicesKey]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function handleBoundsLoaded(code, bounds) {
+    setBoundsByCode(prev => ({ ...prev, [code]: bounds }))
+  }
+
   return (
     <div className={styles.mapWrapper}>
       <MapContainer
@@ -107,10 +141,12 @@ export default function MapView({ selectedPractices, centroids }) {
         className={styles.map}
         zoomControl={true}
       >
+        {/* CartoDB Positron — light, minimal basemap designed for data overlays */}
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
           maxZoom={19}
+          subdomains="abcd"
         />
 
         {selectedPractices.map((practice, i) => (
@@ -119,12 +155,15 @@ export default function MapView({ selectedPractices, centroids }) {
             practice={practice}
             color={CHART_COLORS[i % CHART_COLORS.length]}
             centroids={centroids}
+            onBoundsLoaded={handleBoundsLoaded}
           />
         ))}
 
-        {selectedPractices.length > 0 && (
-          <FitBounds practices={selectedPractices} centroids={centroids} />
-        )}
+        <BoundsController
+          practices={selectedPractices}
+          boundsByCode={boundsByCode}
+          centroids={centroids}
+        />
       </MapContainer>
     </div>
   )
