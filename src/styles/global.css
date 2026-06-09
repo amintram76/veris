@@ -1,40 +1,148 @@
+/* ============================================================
+   Veris — Design Tokens + Base Styles
+   Bold geometric sans system. Space Grotesk for display/brand,
+   Hanken Grotesque for UI/body, Newsreader for long-form reading.
+   ============================================================ */
+
 :root {
-  /* Colour palette */
-  --green-vivid: #52B788;
-  --green-deep: #2D6A4F;
-  --green-light: #D8F3DC;
-  --green-mid: #95D5B2;
+  /* ---- Brand greens ---- */
+  --green-forest: #173E2C; /* darkest — SVG sweeps, header/footer frames */
+  --green-deep:   #2D6A4F; /* primary brand — actions, headings, logo     */
+  --green-vivid:  #52B788; /* bright accent — hovers, highlights, marks   */
+  --green-mid:    #95D5B2; /* supporting — logo wedge, chart lines        */
+  --green-light:  #D8F3DC; /* tint — tags, soft fills, selection          */
+  --green-wash:   #ECF7F0; /* faintest — sunken surfaces, hover rows      */
 
-  --ink: #1A2E22;
-  --ink-soft: #3D5246;
-  --ink-muted: #6B8F78;
+  /* ---- Ink (near-black greens for text) ---- */
+  --ink:       #14241B; /* strongest body + display text                  */
+  --ink-soft:  #3D5246; /* secondary text, long-form body                 */
+  --ink-muted: #6B8F78; /* captions, metadata, disabled                   */
 
-  --surface: #FAFCFA;
-  --surface-alt: #F2F7F4;
-  --surface-card: #FFFFFF;
-  --border: #D4E8DA;
+  /* ---- Paper / surfaces ---- */
+  --surface:       #FAFCFA; /* page background                            */
+  --surface-alt:   #F2F7F4; /* sunken sections, footer base               */
+  --surface-card:  #FFFFFF; /* cards, panels                              */
+  --border:        #D4E8DA; /* hairline dividers, card edges              */
+  --border-strong: #B5D8C2; /* stronger separators, input borders         */
 
-  /* Typography */
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-body: 'DM Sans', system-ui, sans-serif;
+  /* ---- Signal colours (data only) ---- */
+  --clay:       #C0492B; /* negative / decline                            */
+  --clay-soft:  #F4E0DA; /* negative tint                                 */
+  --amber:      #C98A28; /* warnings / anomaly markers                    */
+  --amber-soft: #F6ECD6; /* warning tint                                  */
 
-  /* Spacing scale */
-  --space-xs: 0.5rem;
-  --space-sm: 1rem;
-  --space-md: 1.5rem;
-  --space-lg: 2.5rem;
-  --space-xl: 4rem;
-  --space-2xl: 6rem;
+  /* ---- Semantic aliases ---- */
+  --text-strong:        var(--ink);
+  --text-body:          var(--ink-soft);
+  --text-muted:         var(--ink-muted);
+  --text-brand:         var(--green-deep);
+  --text-on-dark:       #EAF7EF;
+  --text-on-dark-muted: #9FC6AE;
 
-  /* Radius */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 16px;
+  --surface-page:    var(--surface);
+  --surface-sunken:  var(--surface-alt);
+  --surface-raised:  var(--surface-card);
+  --surface-inverse: var(--green-forest); /* bold dark-green section blocks */
+  --surface-brand:   var(--green-deep);
+  --surface-tint:    var(--green-light);
+  --surface-wash:    var(--green-wash);
 
-  /* Transitions */
-  --transition: 200ms ease;
+  --brand:         var(--green-deep);
+  --brand-hover:   var(--green-vivid);
+  --accent:        var(--green-vivid);
+  --focus-ring:    var(--green-vivid);
+
+  --border-subtle:  var(--border);
+  --border-bold:    var(--border-strong);
+  --border-inverse: rgba(255, 255, 255, 0.16);
+
+  --positive:      var(--green-deep);
+  --positive-mark: var(--green-vivid);
+  --negative:      var(--clay);
+  --negative-bg:   var(--clay-soft);
+  --warning:       var(--amber);
+  --warning-bg:    var(--amber-soft);
+
+  /* ---- Font families ---- */
+  --font-display: 'Space Grotesk', 'Hanken Grotesque', system-ui, sans-serif;
+  --font-serif:   'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-ui:      'Hanken Grotesque', system-ui, -apple-system, sans-serif;
+  --font-mono:    'Space Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --font-body:    var(--font-ui); /* backwards-compat alias */
+
+  /* ---- Font weights ---- */
+  --weight-light:    300;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-black:    800; /* Hanken Grotesque only */
+
+  /* ---- Type scale ---- */
+  --text-hero:    clamp(3rem, 6.5vw, 5.25rem);
+  --text-display: clamp(2.4rem, 4.5vw, 3.6rem);
+  --text-h1:      clamp(2rem, 3.5vw, 2.85rem);
+  --text-h2:      clamp(1.6rem, 2.6vw, 2.1rem);
+  --text-h3:      clamp(1.3rem, 1.9vw, 1.55rem);
+  --text-h4:      1.15rem;
+  --text-lead:    clamp(1.15rem, 1.6vw, 1.35rem);
+  --text-body-lg: 1.0625rem;
+  --text-body:    1rem;
+  --text-sm:      0.875rem;
+  --text-xs:      0.78rem;
+  --text-2xs:     0.6875rem;
+
+  /* ---- Line heights ---- */
+  --leading-tight:   1.08;
+  --leading-snug:    1.2;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.75;
+
+  /* ---- Letter spacing ---- */
+  --tracking-tight:  -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.08em;
+  --tracking-wider:  0.14em;
+
+  /* ---- Spacing scale (8px base) ---- */
+  --space-3xs: 0.25rem;  /*  4px */
+  --space-2xs: 0.5rem;   /*  8px */
+  --space-xs:  0.75rem;  /* 12px */
+  --space-sm:  1rem;     /* 16px */
+  --space-md:  1.5rem;   /* 24px */
+  --space-lg:  2.5rem;   /* 40px */
+  --space-xl:  4rem;     /* 64px */
+  --space-2xl: 6rem;     /* 96px */
+  --space-3xl: 8.5rem;   /* 136px */
+
+  /* ---- Layout widths ---- */
+  --width-prose:  44rem;
+  --width-narrow: 50rem;
+  --width-page:   75rem;
+
+  /* ---- Radius ---- */
+  --radius-xs:   3px;
+  --radius-sm:   5px;
+  --radius-md:   8px;
+  --radius-lg:   14px;
+  --radius-xl:   22px;
+  --radius-full: 999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs:    0 1px 2px rgba(20, 36, 27, 0.06);
+  --shadow-sm:    0 2px 8px rgba(20, 36, 27, 0.07);
+  --shadow-md:    0 10px 28px rgba(23, 62, 44, 0.10);
+  --shadow-lg:    0 22px 60px rgba(23, 62, 44, 0.14);
+  --shadow-focus: 0 0 0 3px rgba(82, 183, 136, 0.4);
+
+  /* ---- Motion ---- */
+  --ease-out:        cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft:       cubic-bezier(0.4, 0, 0.2, 1);
+  --transition:      200ms var(--ease-soft);
+  --transition-slow: 360ms var(--ease-out);
 }
 
+/* ── Reset ───────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -43,58 +151,100 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  font-family: var(--font-body);
-  background: var(--surface);
-  color: var(--ink);
-  line-height: 1.6;
-  font-size: 1rem;
-  font-weight: 300;
+  font-family: var(--font-ui);
+  background: var(--surface-page);
+  color: var(--text-body);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+  font-weight: var(--weight-regular);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3, h4 {
+/* Headings — geometric bold sans (Space Grotesk) */
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
-  font-weight: 400;
-  line-height: 1.2;
-  color: var(--ink);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-strong);
+  text-wrap: balance;
 }
+
+h1 { font-size: var(--text-h1); }
+h2 { font-size: var(--text-h2); }
+h3 { font-size: var(--text-h3); letter-spacing: var(--tracking-normal); }
+h4 { font-size: var(--text-h4); letter-spacing: var(--tracking-normal); }
+
+p {
+  line-height: var(--leading-normal);
+  color: var(--text-body);
+  text-wrap: pretty;
+}
+
+em { font-style: italic; }
 
 a {
-  color: var(--green-deep);
+  color: var(--text-brand);
   text-decoration: none;
   transition: color var(--transition);
 }
+a:hover { color: var(--brand-hover); }
 
-a:hover {
-  color: var(--green-vivid);
+img, svg { max-width: 100%; display: block; }
+
+code, kbd, samp {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
 }
 
-p {
-  line-height: 1.75;
-  color: var(--ink-soft);
+:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  border-radius: var(--radius-xs);
 }
 
-img {
-  max-width: 100%;
-  display: block;
+::selection {
+  background: var(--green-light);
+  color: var(--ink);
 }
 
-/* Utility classes */
+/* ── Layout utilities ─────────────────────────────────────────── */
 .container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 var(--space-md);
+  max-width: var(--width-page);
+  margin-inline: auto;
+  padding-inline: var(--space-md);
 }
 
 .container--narrow {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 0 var(--space-md);
+  max-width: var(--width-narrow);
+  margin-inline: auto;
+  padding-inline: var(--space-md);
 }
 
+.container--prose {
+  max-width: var(--width-prose);
+  margin-inline: auto;
+  padding-inline: var(--space-md);
+}
+
+/* ── Shared utilities ─────────────────────────────────────────── */
+
+/* Editorial eyebrow — recurring brand device */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--text-brand);
+}
+
+/* Tag chip */
 .tag {
   display: inline-block;
   font-size: 0.7rem;
@@ -107,42 +257,35 @@ img {
   border-radius: var(--radius-sm);
 }
 
-/* ── Print styles ────────────────────────────────────────────── */
-@media print {
-  /* Hide site chrome and interactive controls */
-  [data-no-print] { display: none !important; }
+/* Tabular numbers for data contexts */
+.tnum { font-variant-numeric: tabular-nums; }
 
-  /* Show print-only elements */
+/* ── Print styles ─────────────────────────────────────────────── */
+@media print {
+  [data-no-print] { display: none !important; }
   [data-print-only] { display: block !important; }
 
-  /* Reset page background/spacing */
   body {
     background: #fff !important;
     font-size: 11pt;
   }
 
-  /* Remove animations */
   * { animation: none !important; transition: none !important; }
 
-  /* Hide Recharts tooltip, cursor line, and active-dot hover state */
   .recharts-tooltip-wrapper,
   .recharts-tooltip-cursor,
   .recharts-active-dot { display: none !important; }
 
-  /* Ensure cards and tables print cleanly */
   .container, .container--narrow {
     max-width: none !important;
     padding: 0 !important;
   }
 
-  /* Avoid page breaks inside table rows */
   tr { page-break-inside: avoid; }
-
-  /* Borders and shadows degrade gracefully */
   * { box-shadow: none !important; }
 }
 
-/* Page transitions */
+/* ── Page transitions ─────────────────────────────────────────── */
 .page-enter {
   animation: fadeUp 0.4s ease forwards;
 }
@@ -156,4 +299,8 @@ img {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter { animation: none; }
 }

@@ -1,110 +1,112 @@
 import { Link } from 'react-router-dom'
 import styles from './HomePage.module.css'
 
+/* Live-data pulse dot */
+function LiveDot() {
+  return <span className={styles.liveDot} aria-hidden="true" />
+}
+
+const TOOLS = [
+  {
+    tag:  'Data & Analytics',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+      </svg>
+    ),
+    title: 'GP Practice list size comparison',
+    desc:  'Compare registered patient list sizes across practices over time. Benchmark against others and the England national average, with trend charts and key statistics.',
+    to:    '/tools/gp-list-sizes',
+    live:  true,
+  },
+  {
+    tag:  'Mapping',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
+        <line x1="9" y1="3" x2="9" y2="18" />
+        <line x1="15" y1="6" x2="15" y2="21" />
+      </svg>
+    ),
+    title: 'GP Practice boundary map',
+    desc:  'Explore registered catchment boundaries across England. Search by name to overlay boundaries, or click anywhere on the map to find nearest practices and check which catchment covers that point.',
+    to:    '/tools/gp-map',
+    live:  true,
+  },
+]
+
 export default function HomePage() {
   return (
     <div className="page-enter">
 
-      {/* Hero */}
-      <section className={styles.hero}>
-        <div className={styles.heroInner}>
-          <div className={styles.heroContent}>
-            <p className={styles.heroEyebrow}>Primary Care Insight & Support</p>
-            <h1 className={styles.heroHeading}>
-              Clarity, fresh thinking<br />
-              <em>and genuine support</em>
-            </h1>
-            <p className={styles.heroSub}>
-              Veris is a resource for those who lead in primary care — Practice Managers, GP Partners,
-              and primary care leaders navigating the real complexity of general practice.
-              Free tools, honest articles, and a place to find support.
-            </p>
-            <div className={styles.heroCtas}>
-              <Link to="/tools" className={styles.ctaPrimary}>Explore the tools</Link>
-              <Link to="/articles" className={styles.ctaSecondary}>Read the articles</Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* What is Veris */}
-      <section className={styles.about}>
-        <div className="container--narrow">
-          <p className={styles.aboutLead}>
-            The word <em>veris</em> speaks of spring — of new growth, fresh beginnings, and things
-            becoming clear after a long winter. It also carries the Latin root <em>verus</em>: true,
-            genuine, real. That's the spirit behind this site.
+      {/* ── Compact intro ───────────────────────────────────────── */}
+      <section className={styles.intro}>
+        <div className="container">
+          <p className="eyebrow">Primary Care Insight &amp; Support</p>
+          <h1 className={styles.introH}>
+            Free tools and honest writing for primary care leaders.
+          </h1>
+          <p className={styles.introSub}>
+            Practical resources for Practice Managers, GP Partners and primary care leaders —
+            built around the real complexity of general practice.
           </p>
         </div>
       </section>
 
-      {/* Three pillars */}
-      <section className={styles.pillars}>
+      {/* ── Tools — primary focus ────────────────────────────────── */}
+      <section className={styles.homeSec}>
         <div className="container">
-          <div className={styles.pillarsGrid}>
-
-            <div className={styles.pillar}>
-              <div className={styles.pillarIcon}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                </svg>
-              </div>
-              <h3 className={styles.pillarTitle}>Tools</h3>
-              <p className={styles.pillarDesc}>
-                Practical tools built for primary care — calculators, templates, and frameworks
-                to save you time and support clearer thinking.
-              </p>
-              <Link to="/tools" className={styles.pillarLink}>Browse tools →</Link>
+          <div className={styles.secHead}>
+            <div>
+              <p className="eyebrow">Tools</p>
+              <h2 className={styles.secTitle}>Tools built for primary care</h2>
             </div>
+            <Link to="/tools" className={styles.allLink}>All tools →</Link>
+          </div>
 
-            <div className={styles.pillar}>
-              <div className={styles.pillarIcon}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                  <polyline points="14 2 14 8 20 8" />
-                  <line x1="16" y1="13" x2="8" y2="13" />
-                  <line x1="16" y1="17" x2="8" y2="17" />
-                  <polyline points="10 9 9 9 8 9" />
-                </svg>
-              </div>
-              <h3 className={styles.pillarTitle}>Articles</h3>
-              <p className={styles.pillarDesc}>
-                Honest, experience-led writing on the challenges of leading in primary care.
-                No jargon, no quick fixes — just clear thinking.
-              </p>
-              <Link to="/articles" className={styles.pillarLink}>Read articles →</Link>
-            </div>
-
-            <div className={styles.pillar}>
-              <div className={styles.pillarIcon}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
-              </div>
-              <h3 className={styles.pillarTitle}>Get Support</h3>
-              <p className={styles.pillarDesc}>
-                Sometimes you need more than a template. Whether you want a sounding board
-                or specific advice — reach out and let's talk.
-              </p>
-              <Link to="/get-support" className={styles.pillarLink}>Get in touch →</Link>
-            </div>
-
+          <div className={styles.toolsGrid}>
+            {TOOLS.map(tool => (
+              <Link key={tool.title} to={tool.to} className={styles.toolCard}>
+                <div className={styles.toolHead}>
+                  <span className={styles.toolIcon}>{tool.icon}</span>
+                  <span className={styles.toolTag}>{tool.tag}</span>
+                </div>
+                <h3 className={styles.toolTitle}>{tool.title}</h3>
+                <p className={styles.toolDesc}>{tool.desc}</p>
+                <div className={styles.toolFoot}>
+                  <span className={styles.toolLink}>Open tool →</span>
+                  {tool.live && (
+                    <span className={styles.liveBadge}>
+                      <LiveDot />
+                      Live NHS data
+                    </span>
+                  )}
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Closing thought */}
-      <section className={styles.closing}>
-        <div className="container--narrow">
-          <blockquote className={styles.quote}>
-            "The best support I've ever received wasn't advice — it was someone who listened,
-            understood the context, and helped me see things more clearly."
-          </blockquote>
-          <p className={styles.quoteAttr}>— The thinking behind Veris</p>
+      {/* ── Articles — secondary focus ───────────────────────────── */}
+      <section className={`${styles.homeSec} ${styles.homeSecAlt}`}>
+        <div className="container">
+          <div className={styles.secHead}>
+            <div>
+              <p className="eyebrow">Articles</p>
+              <h2 className={styles.secTitle}>Clear thinking, honestly written</h2>
+            </div>
+            <Link to="/articles" className={styles.allLink}>All articles →</Link>
+          </div>
+
+          <div className={styles.articlesBanner}>
+            <p>
+              <strong>Articles are on the way.</strong>{' '}
+              Experience-led writing on the real challenges of leading in primary care —
+              no jargon, no quick fixes. If there's a topic you'd like covered,{' '}
+              <Link to="/get-support">get in touch</Link>.
+            </p>
+          </div>
         </div>
       </section>
 

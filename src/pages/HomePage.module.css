@@ -1,283 +1,246 @@
-/* Hero */
-.hero {
-  background: linear-gradient(135deg, var(--surface) 0%, var(--green-light) 100%);
-  padding: var(--space-2xl) 0;
-  overflow: hidden;
-  position: relative;
+/* ── Compact intro ───────────────────────────────────────────────── */
+.intro {
+  padding: var(--space-xl) 0 var(--space-lg);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
 }
 
-.heroInner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 var(--space-md);
+.intro :global(.eyebrow) {
+  display: block;
+  margin-bottom: 0.75rem;
 }
 
-.heroContent {
-  max-width: 640px;
-}
-.heroEyebrow {
-  font-size: 0.78rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--green-deep);
-  margin-bottom: var(--space-sm);
-}
-
-.heroHeading {
-  font-size: clamp(2.4rem, 5vw, 3.6rem);
-  font-weight: 300;
+.introH {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: clamp(1.7rem, 3.2vw, 2.5rem);
   line-height: 1.1;
+  letter-spacing: -0.025em;
   color: var(--ink);
-  margin-bottom: var(--space-md);
+  max-width: 18ch;
+  margin-bottom: 0.7rem;
 }
 
-.heroHeading em {
-  font-style: italic;
-  color: var(--green-deep);
-}
-
-.heroSub {
-  font-size: 1.05rem;
+.introSub {
+  font-family: var(--font-ui);
+  font-size: var(--text-body-lg);
+  line-height: 1.6;
   color: var(--ink-soft);
-  max-width: 520px;
-  line-height: 1.75;
-  margin-bottom: var(--space-lg);
+  max-width: 56ch;
 }
 
-.heroCtas {
+/* ── Shared section layout ───────────────────────────────────────── */
+.homeSec {
+  padding: var(--space-xl) 0;
+}
+
+.homeSecAlt {
+  background: var(--surface-alt);
+  border-top: 1px solid var(--border);
+}
+
+.secHead {
   display: flex;
-  gap: var(--space-sm);
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
   flex-wrap: wrap;
 }
 
-.ctaPrimary {
-  display: inline-block;
-  background: var(--green-deep);
-  color: var(--surface);
-  font-size: 0.92rem;
-  font-weight: 500;
-  padding: 0.7rem 1.4rem;
-  border-radius: var(--radius-md);
-  text-decoration: none;
-  transition: background var(--transition), transform var(--transition);
+.secHead :global(.eyebrow) {
+  display: block;
+  margin-bottom: 0.45rem;
 }
 
-.ctaPrimary:hover {
-  background: var(--green-vivid);
-  color: var(--surface);
-  transform: translateY(-2px);
-}
-
-.ctaSecondary {
-  display: inline-block;
-  background: transparent;
-  color: var(--green-deep);
-  font-size: 0.92rem;
-  font-weight: 500;
-  padding: 0.7rem 1.4rem;
-  border-radius: var(--radius-md);
-  border: 1.5px solid var(--green-deep);
-  text-decoration: none;
-  transition: background var(--transition), transform var(--transition);
-}
-
-.ctaSecondary:hover {
-  background: var(--green-light);
-  color: var(--green-deep);
-  transform: translateY(-2px);
-}
-
-/* Hero decorative element */
-.heroDecor {
-  position: relative;
-  width: 320px;
-  height: 320px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.decorRing1,
-.decorRing2,
-.decorRing3 {
-  position: absolute;
-  border-radius: 50%;
-  border: 1.5px solid var(--green-mid);
-}
-
-.decorRing1 {
-  width: 280px;
-  height: 280px;
-  opacity: 0.4;
-  animation: rotate 40s linear infinite;
-}
-
-.decorRing2 {
-  width: 200px;
-  height: 200px;
-  opacity: 0.3;
-  animation: rotate 28s linear infinite reverse;
-  border-style: dashed;
-}
-
-.decorRing3 {
-  width: 120px;
-  height: 120px;
-  opacity: 0.5;
-  background: rgba(82, 183, 136, 0.08);
-}
-
-.decorWord {
+.secTitle {
   font-family: var(--font-display);
-  font-size: 1.6rem;
-  font-style: italic;
+  font-weight: var(--weight-bold);
+  font-size: var(--text-h2);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  line-height: var(--leading-snug);
+}
+
+.allLink {
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  font-weight: var(--weight-bold);
   color: var(--green-deep);
-  position: relative;
-  z-index: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--transition);
 }
 
-.decorWordSub {
-  font-size: 0.7rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  position: relative;
-  z-index: 1;
+.allLink:hover {
+  color: var(--green-vivid);
 }
 
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* About strip */
-.about {
-  padding: var(--space-xl) 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.aboutLead {
-  font-family: var(--font-display);
-  font-size: clamp(1.1rem, 2.5vw, 1.35rem);
-  font-weight: 300;
-  line-height: 1.7;
-  color: var(--ink-soft);
-  text-align: center;
-}
-
-.aboutLead em {
-  color: var(--green-deep);
-  font-style: italic;
-}
-
-/* Pillars */
-.pillars {
-  padding: var(--space-2xl) 0;
-}
-
-.pillarsGrid {
+/* ── Tool cards grid ─────────────────────────────────────────────── */
+.toolsGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-md);
 }
 
-.pillar {
+.toolCard {
+  display: flex;
+  flex-direction: column;
   background: var(--surface-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
-  transition: box-shadow var(--transition), transform var(--transition);
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+  cursor: pointer;
 }
 
-.pillar:hover {
-  box-shadow: 0 8px 32px rgba(45, 106, 79, 0.1);
+.toolCard:hover {
+  box-shadow: var(--shadow-md);
   transform: translateY(-3px);
+  border-color: var(--border-strong);
 }
 
-.pillarIcon {
-  width: 44px;
-  height: 44px;
-  background: var(--green-light);
+.toolHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+/* Dark evergreen icon box with vivid green icon */
+.toolIcon {
+  width: 46px;
+  height: 46px;
   border-radius: var(--radius-md);
+  background: var(--surface-inverse);
+  color: var(--green-vivid);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--space-md);
-  color: var(--green-deep);
+  flex-shrink: 0;
 }
 
-.pillarIcon svg {
-  width: 22px;
-  height: 22px;
+/* Outline tag */
+.toolTag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-brand);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.6rem;
+  background: transparent;
 }
 
-.pillarTitle {
+.toolTitle {
   font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 400;
+  font-size: 1.5rem;
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.015em;
   color: var(--ink);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.6rem;
+  line-height: var(--leading-snug);
 }
 
-.pillarDesc {
-  font-size: 0.9rem;
+.toolDesc {
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  line-height: 1.65;
   color: var(--ink-soft);
-  line-height: 1.7;
   margin-bottom: var(--space-md);
+  flex: 1; /* push footer to bottom of card */
 }
 
-.pillarLink {
-  font-size: 0.85rem;
-  font-weight: 500;
+.toolFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.toolLink {
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  font-weight: var(--weight-bold);
   color: var(--green-deep);
-  text-decoration: none;
   transition: color var(--transition);
 }
 
-.pillarLink:hover {
+.toolCard:hover .toolLink {
   color: var(--green-vivid);
 }
 
-/* Closing */
-.closing {
-  padding: var(--space-2xl) 0;
-  background: var(--surface-alt);
-  border-top: 1px solid var(--border);
-  text-align: center;
-}
-
-.quote {
-  font-family: var(--font-display);
-  font-size: clamp(1rem, 2.2vw, 1.25rem);
-  font-style: italic;
-  font-weight: 300;
-  color: var(--ink-soft);
-  line-height: 1.7;
-  border: none;
-  padding: 0;
-  margin-bottom: 1rem;
-  quotes: none;
-}
-
-.quoteAttr {
-  font-size: 0.8rem;
+/* "Live NHS data" badge */
+.liveBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ink-muted);
+  white-space: nowrap;
 }
 
-/* Responsive */
-@media (max-width: 900px) {
-  .heroInner {
+.liveDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green-vivid);
+  box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.25);
+  flex-shrink: 0;
+}
+
+/* ── Articles "coming soon" banner ───────────────────────────────── */
+.articlesBanner {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+}
+
+.articlesBanner p {
+  font-family: var(--font-ui);
+  font-size: var(--text-body-lg);
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+.articlesBanner strong {
+  color: var(--ink);
+}
+
+.articlesBanner a {
+  color: var(--green-deep);
+  font-weight: var(--weight-semibold);
+  text-decoration: underline;
+}
+
+.articlesBanner a:hover {
+  color: var(--green-vivid);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 880px) {
+  .toolsGrid {
     grid-template-columns: 1fr;
   }
-  .heroDecor {
-    display: none;
+}
+
+@media (max-width: 600px) {
+  .introH {
+    max-width: none;
   }
-  .pillarsGrid {
-    grid-template-columns: 1fr;
+
+  .secHead {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
